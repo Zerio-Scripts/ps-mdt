@@ -4324,93 +4324,19 @@ $(document).ready(() => {
       );
     } else if (eventData.type == "call") {
       const value = eventData.data;
+
       DispatchMAP(value);
-      if (value && value.job.includes(playerJob)) {
-        const prio = value["priority"];
-        let DispatchItem = `<div class="active-calls-item" data-id="${value.callId}" data-canrespond="false"><div class="active-call-inner-container"><div class="call-item-top"><div class="call-number">#${value.callId}</div><div class="call-code priority-${value.priority}">${value.dispatchCode}</div><div class="call-title">${value.dispatchMessage}</div><div class="call-radio">${value.units.length}</div></div><div class="call-item-bottom">`;
 
-        if (
-          value.dispatchCode == "911" ||
-          value.dispatchCode == "311"
-        ) {
-          DispatchItem = `<div class="active-calls-item" data-id="${value.callId}" data-canrespond="true"><div class="active-call-inner-container"><div class="call-item-top"><div class="call-number">#${value.callId}</div><div class="call-code priority-${value.priority}">${value.dispatchCode}</div><div class="call-title">${value.dispatchMessage}</div><div class="call-radio">${value.units.length}</div></div><div class="call-item-bottom">`;
-        }
+      let DispatchItem = `<div class="active-calls-item" data-id="${value.uid}" data-canrespond="true"><div class="active-call-inner-container"><div class="call-item-top"><div class="call-number">#${calls.length + 1}</div><div class="call-code">${value.top.code}</div><div class="call-title">${value.top.text}</div><div class="call-radio">${value.claimedList.length}</div></div><div class="call-item-bottom">`;
 
-        if (value["time"]) {
-          DispatchItem += `<div class="call-bottom-info"><span class="fas fa-clock"></span>${timeAgo(
-            value.time
-          )}</div>`;
-        }
-
-        if (value["firstStreet"]) {
-          DispatchItem += `<div class="call-bottom-info"><span class="fas fa-map-pin"></span>${value.firstStreet}</div>`;
-        }
-
-        if (value['camId']) {
-          DispatchItem += `<div class="call-bottom-info"><span class="fas fa-camera"></span>${value.camId}</div>`;
-        }
-
-        if (value["callsign"]) {
-          DispatchItem += `<div class="call-bottom-info"><span class="fas fa-compass"></span>${value.callsign}</div>`;
-        }
-
-        if (value["doorCount"]) {
-          DispatchItem += `<div class="call-bottom-info"><span class="fas fa-door-open"></span>${value.doorCount}</div>`;
-        }
-
-        if (value["speed"]) {
-          DispatchItem += `<div class="call-bottom-info"><span class="fas fa-arrow-right"></span>${value.speed}</div>`;
-        }
-
-        if (value["weapon"]) {
-          DispatchItem += `<div class="call-bottom-info"><span class="fas fa-bullseye"></span>${value.weapon}</div>`;
-        }
-
-        if (value["heading"]) {
-          DispatchItem += `<div class="call-bottom-info"><span class="fas fa-share"></span>${value.heading}</div>`;
-        }
-
-        if (value["gender"]) {
-          let gender = "Male";
-          if (value["gender"] == 0 || value["gender"] == 2) {
-            gender = "Female";
-          }
-          DispatchItem += `<div class="call-bottom-info"><span class="fas fa-genderless"></span>${gender}</div>`;
-        }
-
-        if (value["model"] && value["plate"]) {
-          DispatchItem += `<div class="call-bottom-info"><span class="fas fa-car"></span>${value["model"]}<span class="fas fa-digital-tachograph" style="margin-left: 2vh;"></span>${value["plate"]}</div>`;
-        } else if (value["plate"]) {
-          DispatchItem += `<div class="call-bottom-info"><span class="fas fa-digital-tachograph"></span>${value["plate"]}</div>`;
-        } else if (value["model"]) {
-          DispatchItem += `<div class="call-bottom-info"><span class="fas fa-car"></span>${value["model"]}</div>`;
-        }
-
-        if (value["firstColor"]) {
-          DispatchItem += `<div class="call-bottom-info"><span class="fas fa-spray-can"></span>${value["firstColor"]}</div>`;
-        }
-
-        if (value["automaticGunfire"] == true) {
-          DispatchItem += `<div class="call-bottom-info"><span class="fab fa-blackberry"></span>Automatic Gunfire</div>`;
-        }
-
-        if (value["name"] && value["number"]) {
-          DispatchItem += `<div class="call-bottom-info"><span class="far fa-id-badge"></span>${value["name"]}<span class="fas fa-mobile-alt" style="margin-left: 2vh;"></span>${value["number"]}</div>`;
-        } else if (value["number"]) {
-          DispatchItem += `<div class="call-bottom-info"><span class="fas fa-mobile-alt"></span>${value["number"]}</div>`;
-        } else if (value["name"]) {
-          DispatchItem += `<div class="call-bottom-info"><span class="far fa-id-badge"></span>${value["name"]}</div>`;
-        }
-
-        if (value["information"]) {
-          DispatchItem += `<div class="call-bottom-info call-bottom-information"><span class="far fa-question-circle"></span>${value["information"]}</div>`;
-        }
-
-        DispatchItem += `</div></div></div>`;
-        $(".active-calls-list").prepend(
-          $(DispatchItem).hide().fadeIn("slow")
-        );
+      for (let i = 0; i < value.fields.length; i++) {
+        DispatchItem += `<div class="call-bottom-info"><span class="mdi ${value.fields[i].icon}" style="margin-left: -0.1vh;"></span>${value.fields[i].text}</div>`;
       }
+
+      DispatchItem += `</div></div></div>`;
+      $(".active-calls-list").prepend(
+        DispatchItem
+      );
     } else if (eventData.type == "sendCallResponse") {
       if ($(".respond-calls-container").data("id") == eventData.callid) {
         $(".respond-calls-responses").prepend(
@@ -5589,9 +5515,9 @@ function DispatchMAP(DISPATCH) {
   var MIN = Math.round(Math.round((new Date() - new Date(DISPATCH.time)) / 1000) / 60);
   if (MIN > 10) return;
 
-  var COORDS_X = DISPATCH.origin.x
-  var COORDS_Y = DISPATCH.origin.y
-  var CODE = DISPATCH.callId
+  var COORDS_X = DISPATCH.position[0]
+  var COORDS_Y = DISPATCH.position[1]
+  var CODE = DISPATCH.top.code
 
   Dispatches[CODE] = L.marker([COORDS_Y, COORDS_X], { icon: DispatchPing });
   Dispatches[CODE].addTo(map);
@@ -5601,7 +5527,7 @@ function DispatchMAP(DISPATCH) {
     map.removeLayer(Dispatches[CODE]);
   }, 1200000);
   
-  Dispatches[CODE].bindTooltip(`<div class="map-tooltip-info">${DISPATCH.dispatchMessage}</div></div><div class="map-tooltip-id">#${DISPATCH.callId}</div>`,
+  Dispatches[CODE].bindTooltip(`<div class="map-tooltip-info">${DISPATCH.top.text}</div></div><div class="map-tooltip-id">#${DISPATCH.top.code}</div>`,
       {
           direction: 'top',
           permanent: false,

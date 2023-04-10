@@ -908,11 +908,10 @@ end)
 ------------------------------------------
 -- ====================================================================================
 
-RegisterNetEvent('dispatch:clNotify',
-                 function(sNotificationData, sNotificationId)
+RegisterNetEvent('zerio-dispatch:client:addAlert',
+                 function(data)
     if LocalPlayer.state.isLoggedIn then
-        sNotificationData.playerJob = PlayerData.job.name
-        SendNUIMessage({type = "call", data = sNotificationData})
+        SendNUIMessage({type = "call", data = data})
     end
 end)
 
