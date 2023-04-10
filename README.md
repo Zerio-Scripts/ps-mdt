@@ -1,6 +1,7 @@
 # Project Sloth MDT
 
 **This is the same as the normal ps-mdt, just that its reworked to work with zerio-dispatch**
+**Make sure to set up the `Config.DispatchMenuIndex` & make sure to set `Config.UsingPSMdt` to `true` in `zerio-dispatch`**
 
 For all support questions, ask in our [Discord](https://www.discord.gg/projectsloth) support chat. Do not create issues if you need help. Issues are for bug reporting and new features only.
 

@@ -201,7 +201,7 @@ RegisterNetEvent('mdt:server:openMDT', function()
 
 	local JobType = GetJobType(PlayerData.job.name)
 	local bulletin = GetBulletins(JobType)
-	local calls = exports['ps-dispatch']:GetDispatchCalls()
+	local calls = exports['zerio-dispatch']:GetAlerts(Config.DispatchMenuIndex)
 	TriggerClientEvent('mdt:client:open', src, bulletin, activeUnits, calls, PlayerData.citizenid)
 end)
 
@@ -1057,7 +1057,7 @@ RegisterNetEvent('mdt:server:searchCalls', function(calls)
 	local Player = QBCore.Functions.GetPlayer(src)
 	local JobType = GetJobType(Player.PlayerData.job.name)
 	if JobType == 'police' then
-		local calls = exports['ps-dispatch']:GetDispatchCalls()
+		local calls = exports['zerio-dispatch']:GetAlerts(Config.DispatchMenuIndex)
 		TriggerClientEvent('mdt:client:getCalls', src, calls)
 
 	end
@@ -1322,7 +1322,7 @@ RegisterNetEvent('mdt:server:setWaypoint', function(callid)
 	if JobType == 'police' or JobType == 'ambulance' then
 		if callid then
 			if isDispatchRunning then
-				local calls = exports['ps-dispatch']:GetDispatchCalls()
+				local calls = exports['zerio-dispatch']:GetAlerts(Config.DispatchMenuIndex)
 				TriggerClientEvent('mdt:client:setWaypoint', src, calls[callid])
 			end
 		end
@@ -1375,7 +1375,7 @@ RegisterNetEvent('mdt:server:attachedUnits', function(callid)
 	if JobType == 'police' or JobType == 'ambulance' then
 		if callid then
 			if isDispatchRunning then
-				local calls = exports['ps-dispatch']:GetDispatchCalls()
+				local calls = exports['zerio-dispatch']:GetAlerts(Config.DispatchMenuIndex)
 				TriggerClientEvent('mdt:client:attachedUnits', src, calls[callid]['units'], callid)
 			end
 		end
@@ -1410,7 +1410,7 @@ RegisterNetEvent('mdt:server:setDispatchWaypoint', function(callid, cid)
 	if JobType == 'police' or JobType == 'ambulance' then
 		if callid then
 			if isDispatchRunning then
-				local calls = exports['ps-dispatch']:GetDispatchCalls()
+				local calls = exports['zerio-dispatch']:GetAlerts(Config.DispatchMenuIndex)
 				TriggerClientEvent('mdt:client:setWaypoint', src, calls[callid])
 			end
 		end
@@ -1487,7 +1487,7 @@ RegisterNetEvent('mdt:server:getCallResponses', function(callid)
 	local Player = QBCore.Functions.GetPlayer(src)
 	if IsPoliceOrEms(Player.PlayerData.job.name) then
 		if isDispatchRunning then
-			local calls = exports['ps-dispatch']:GetDispatchCalls()
+			local calls = exports['zerio-dispatch']:GetAlerts(Config.DispatchMenuIndex)
 			TriggerClientEvent('mdt:client:getCallResponses', src, calls[callid]['responses'], callid)
 		end
 	end

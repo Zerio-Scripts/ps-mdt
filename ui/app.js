@@ -3447,94 +3447,44 @@ $(document).ready(() => {
     ".active-calls-item",
     function (e) {
       const callId = $(this).data("id");
-      const canRespond = $(this).data("canrespond");
       if (callId) {
-        if (canRespond == true) {
-          args = [
-            {
-              className: "respond-call",
-              icon: "fas fa-reply",
-              text: "Respond to Call",
-              info: callId,
-              status: "",
-            },
-            {
-              className: "attached-units",
-              icon: "fas fa-link",
-              text: "Attached Units",
-              info: callId,
-              status: "",
-            },
-            {
-              className: "call-detach",
-              icon: "fas fa-sign-out-alt",
-              text: "Detach",
-              info: callId,
-              status: "",
-            },
-            {
-              className: "call-attach",
-              icon: "fas fa-sign-in-alt",
-              text: "Respond",
-              info: callId,
-              status: "",
-            },
-            {
-              className: "Set-Waypoint",
-              icon: "fas fa-map-marker-alt",
-              text: "Set Waypoint",
-              info: callId,
-              status: "",
-            },
-            {
-              className: "remove-blip",
-              icon: "fa-solid fa-circle-minus",
-              text: "Remove Blip",
-              info: callId,
-              status: "",
-            },
-          ];
-        } else if (canRespond == false) {
-          args = [
-            {
-              className: "attached-units",
-              icon: "fas fa-link",
-              text: "Attached Units",
-              info: callId,
-              status: "",
-            },
-            {
-              className: "call-detach",
-              icon: "fas fa-sign-out-alt",
-              text: "Detach",
-              info: callId,
-              status: "",
-            },
-            {
-              className: "call-attach",
-              icon: "fas fa-sign-in-alt",
-              text: "Respond",
-              info: callId,
-              status: "",
-            },
-            {
-              className: "Set-Waypoint",
-              icon: "fas fa-map-marker-alt",
-              text: "Set Waypoint",
-              info: callId,
-              status: "",
-            },
-            {
-              className: "remove-blip",
-              icon: "fa-solid fa-circle-minus",
-              text: "Remove Blip",
-              info: callId,
-              status: "",
-            },
-          ];
-        }
-
-        openContextMenu(e, args);
+        openContextMenu(e, [
+          {
+            className: "respond-call",
+            icon: "fas fa-reply",
+            text: "Respond to Call",
+            info: callId,
+            status: "",
+          },
+          {
+            className: "attached-units",
+            icon: "fas fa-link",
+            text: "Attached Units",
+            info: callId,
+            status: "",
+          },
+          {
+            className: "call-detach",
+            icon: "fas fa-sign-out-alt",
+            text: "Detach",
+            info: callId,
+            status: "",
+          },
+          {
+            className: "call-attach",
+            icon: "fas fa-sign-in-alt",
+            text: "Respond",
+            info: callId,
+            status: "",
+          },
+          {
+            className: "Set-Waypoint",
+            icon: "fas fa-map-marker-alt",
+            text: "Set Waypoint",
+            info: callId,
+            status: "",
+          },
+        ]);
       }
     }
   );
@@ -4557,80 +4507,16 @@ $(document).ready(() => {
       const table = eventData.data;
       $(".active-calls-list").empty();
       $.each(table, function (index, value) {
-        if (value && value.job.includes(playerJob)) {
-          const prio = value["priority"];
-          let DispatchItem = `<div class="active-calls-item" data-id="${value.callId}" data-canrespond="false"><div class="active-call-inner-container"><div class="call-item-top"><div class="call-number">#${value.callId}</div><div class="call-code priority-${value.priority}">${value.dispatchCode}</div><div class="call-title">${value.dispatchMessage}</div><div class="call-radio">${value.units.length}</div></div><div class="call-item-bottom">`;
+        let DispatchItem = `<div class="active-calls-item" data-id="${index}" data-canrespond="true"><div class="active-call-inner-container"><div class="call-item-top"><div class="call-number">#${index + 1}</div><div class="call-code">${value.top.code}</div><div class="call-title">${value.top.text}</div><div class="call-radio">${value.claimedList.length}</div></div><div class="call-item-bottom">`;
 
-          if (
-            value.dispatchCode == "911" ||
-            value.dispatchCode == "311"
-          ) {
-            DispatchItem = `<div class="active-calls-item" data-id="${value.callId}" data-canrespond="true"><div class="active-call-inner-container"><div class="call-item-top"><div class="call-number">#${value.callId}</div><div class="call-code priority-${value.priority}">${value.dispatchCode}</div><div class="call-title">${value.dispatchMessage}</div><div class="call-radio">${value.units.length}</div></div><div class="call-item-bottom">`;
-          }
-
-          if (value["time"]) {
-            DispatchItem += `<div class="call-bottom-info"><span class="fas fa-clock" style="margin-left: -0.1vh;"></span>${timeAgo(
-              value.time
-            )}</div>`;
-          }
-
-          if (value["firstStreet"]) {
-            DispatchItem += `<div class="call-bottom-info"><span class="fas fa-map-pin"></span>${value.firstStreet}</div>`;
-          }
-
-          if (value['camId']) {
-            DispatchItem += `<div class="call-bottom-info"><span class="fas fa-camera"></span>${value.camId}</div>`;
-          }
-
-          if (value["heading"]) {
-            DispatchItem += `<div class="call-bottom-info"><span class="fas fa-share"></span>${value.heading}</div>`;
-          }
-
-          if (value["weapon"]) {
-            DispatchItem += `<div class="call-bottom-info"><span class="fas fa-gun"></span>${value.weapon}</div>`;
-          }
-          
-          if (value["gender"]) {
-            let gender = "Male";
-            if (value["gender"] == 0 || value["gender"] == 2) {
-              gender = "Female";
-            }
-            DispatchItem += `<div class="call-bottom-info"><span class="fas fa-genderless"></span>${gender}</div>`;
-          }
-
-          if (value["model"] && value["plate"]) {
-            DispatchItem += `<div class="call-bottom-info"><span class="fas fa-car"></span>${value["model"]}<span class="fas fa-digital-tachograph" style="margin-left: 2vh;"></span>${value["plate"]}</div>`;
-          } else if (value["plate"]) {
-            DispatchItem += `<div class="call-bottom-info"><span class="fas fa-digital-tachograph"></span>${value["plate"]}</div>`;
-          } else if (value["model"]) {
-            DispatchItem += `<div class="call-bottom-info"><span class="fas fa-car"></span>${value["model"]}</div>`;
-          }
-
-          if (value["firstColor"]) {
-            DispatchItem += `<div class="call-bottom-info"><span class="fas fa-spray-can"></span>${value["firstColor"]}</div>`;
-          }
-
-          if (value["automaticGunfire"] == true) {
-            DispatchItem += `<div class="call-bottom-info"><span class="fab fa-blackberry"></span>Automatic Gunfire</div>`;
-          }
-
-          if (value["name"] && value["number"]) {
-            DispatchItem += `<div class="call-bottom-info"><span class="far fa-id-badge"></span>${value["name"]}<span class="fas fa-mobile-alt" style="margin-left: 2vh;"></span>${value["number"]}</div>`;
-          } else if (value["number"]) {
-            DispatchItem += `<div class="call-bottom-info"><span class="fas fa-mobile-alt"></span>${value["number"]}</div>`;
-          } else if (value["name"]) {
-            DispatchItem += `<div class="call-bottom-info"><span class="far fa-id-badge"></span>${value["name"]}</div>`;
-          }
-
-          if (value["information"]) {
-            DispatchItem += `<div class="call-bottom-info call-bottom-information"><span class="far fa-question-circle"></span>${value["information"]}</div>`;
-          }
-
-          DispatchItem += `</div></div></div>`;
-          $(".active-calls-list").prepend(
-            $(DispatchItem).hide().fadeIn("slow")
-          );
+        for (let i = 0; i < value.fields.length; i++) {
+          DispatchItem += `<div class="call-bottom-info"><span class="mdi ${value.fields[i].icon}" style="margin-left: -0.1vh;"></span>${value.fields[i].text}</div>`;
         }
+
+        DispatchItem += `</div></div></div>`;
+        $(".active-calls-list").prepend(
+          $(DispatchItem).hide().fadeIn("slow")
+        );
       });
     } else if (eventData.type == "incidents") {
       let table = eventData.data;
