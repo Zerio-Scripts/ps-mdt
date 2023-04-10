@@ -916,24 +916,21 @@ RegisterNetEvent('dispatch:clNotify',
     end
 end)
 
-RegisterNUICallback("setWaypoint", function(data, cb)
-    TriggerServerEvent('mdt:server:setWaypoint', data.callid)
-    cb(true)
-end)
-
-RegisterNUICallback("callDetach", function(data, cb)
-    TriggerServerEvent('mdt:server:callDetach', data.callid)
-    cb(true)
-end)
-
 RegisterNUICallback("callAttach", function(data, cb)
-    TriggerServerEvent('mdt:server:callAttach', data.callid)
+    SetNewWaypoint(tonumber(data.position[1]), tonumber(data.position[2]))
+    TriggerServerEvent("zerio-dispatch:server:copylocation", {
+        menuindex = Config.DispatchMenuIndex,
+        uid = data.uid,
+        position = data.position
+    })
     cb(true)
 end)
 
-RegisterNUICallback("attachedUnits", function(data, cb)
-    TriggerServerEvent('mdt:server:attachedUnits', data.callid)
-    cb(true)
+RegisterNUICallback("fetchAttachedUnits", function(data, cb)
+    QBCore.Functions.TriggerCallback('zerio-dispatch:server:fetchAttachedUnits',
+                                     function(resp)
+        cb(resp)
+    end, Config.DispatchMenuIndex, data.uid)
 end)
 
 RegisterNUICallback("callDispatchDetach", function(data, cb)
@@ -952,7 +949,7 @@ RegisterNUICallback("callDragAttach", function(data, cb)
 end)
 
 RegisterNUICallback("setWaypointU", function(data, cb)
-    TriggerServerEvent('mdt:server:setWaypoint:unit', data.cid)
+    TriggerServerEvent('mdt:server:setWaypoint:unit', data.source)
     cb(true)
 end)
 
@@ -1031,10 +1028,6 @@ end)
 RegisterNUICallback('openCamera', function(data)
     local camId = tonumber(data.cam)
     TriggerEvent('police:client:ActiveCamera', camId)
-end)
-
-RegisterNetEvent('mdt:client:attachedUnits', function(sentData, callid)
-    SendNUIMessage({type = "attachedUnits", data = sentData, callid = callid})
 end)
 
 RegisterNetEvent('mdt:client:setWaypoint', function(callInformation)

@@ -1348,26 +1348,6 @@ RegisterNetEvent('mdt:server:callDetach', function(callid)
 	end
 end)
 
-RegisterNetEvent('mdt:server:callAttach', function(callid)
-	local src = source
-	local Player = QBCore.Functions.GetPlayer(src)
-	local playerdata = {
-		fullname = Player.PlayerData.charinfo.firstname.. " "..Player.PlayerData.charinfo.lastname,
-		job = Player.PlayerData.job,
-		cid = Player.PlayerData.citizenid,
-		callsign = Player.PlayerData.metadata.callsign
-	}
-	local JobType = GetJobType(Player.PlayerData.job.name)
-	if JobType == 'police' or JobType == 'ambulance' then
-		if callid then
-			TriggerEvent('dispatch:addUnit', callid, playerdata, function(newNum)
-				TriggerClientEvent('mdt:client:callAttach', -1, callid, newNum)
-			end)
-		end
-	end
-
-end)
-
 RegisterNetEvent('mdt:server:attachedUnits', function(callid)
 	local src = source
 	local Player = QBCore.Functions.GetPlayer(src)
@@ -1438,10 +1418,8 @@ RegisterNetEvent('mdt:server:callDragAttach', function(callid, cid)
 	end
 end)
 
-RegisterNetEvent('mdt:server:setWaypoint:unit', function(cid)
-	local src = source
-	local Player = QBCore.Functions.GetPlayerByCitizenId(cid)
-	local PlayerCoords = GetEntityCoords(GetPlayerPed(Player.PlayerData.source))
+RegisterNetEvent('mdt:server:setWaypoint:unit', function(src)
+	local PlayerCoords = GetEntityCoords(GetPlayerPed(src))
 	TriggerClientEvent("mdt:client:setWaypoint:unit", src, PlayerCoords)
 end)
 

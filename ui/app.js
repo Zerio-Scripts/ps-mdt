@@ -24,6 +24,7 @@ var DispatchNum = 0;
 var playerJob = "";
 let rosterLink  = "";
 let sopLink = "";
+let calls = [];
 
 //Set this to false if you don't want to show the send to community service button on the incidents page
 const canSendToCommunityService = true
@@ -3307,16 +3308,6 @@ $(document).ready(() => {
     $(".radio-container").data("id", info);
   });
 
-  $(".contextmenu").on("click", ".set-waypoint", function () {
-    let info = $(this).data("info");
-    $.post(
-      `https://${GetParentResourceName()}/setWaypointU`,
-      JSON.stringify({
-        cid: info,
-      })
-    );
-  });
-
   $(".active-unit-list").on("contextmenu", ".active-unit-item", function (e) {
     let cid = $(this).data("id");
     if (cid) {
@@ -3354,32 +3345,21 @@ $(document).ready(() => {
     }
   });
 
-  $(".contextmenu").on("click", ".Set-Waypoint", function () {
-    const callId = $(this).data("info");
-    $.post(
-      `https://${GetParentResourceName()}/setWaypoint`,
-      JSON.stringify({
-        callid: callId,
-      })
-    );
-  });
-
   $(".contextmenu").on("click", ".call-attach", function () {
     const callId = $(this).data("info");
+
     $.post(
       `https://${GetParentResourceName()}/callAttach`,
-      JSON.stringify({
-        callid: callId,
-      })
+      JSON.stringify(calls[callId])
     );
   });
 
-  $(".contextmenu").on("click", ".call-detach", function () {
-    const callId = $(this).data("info");
+  $(".contextmenu").on("click", ".set-waypoint", function () {
+    let info = $(this).data("info");
     $.post(
-      `https://${GetParentResourceName()}/callDetach`,
+      `https://${GetParentResourceName()}/setWaypointU`,
       JSON.stringify({
-        callid: callId,
+        source: info,
       })
     );
   });
@@ -3396,12 +3376,25 @@ $(document).ready(() => {
 
   $(".contextmenu").on("click", ".attached-units", function () {
     const callId = $(this).data("info");
-    $.post(
-      `https://${GetParentResourceName()}/attachedUnits`,
-      JSON.stringify({
-        callid: callId,
+    const table = calls[callId];
+
+    if (table !== undefined) {
+      $.post(`https://${GetParentResourceName()}/fetchAttachedUnits`, JSON.stringify({
+        uid: table.uid
+      })).then((resp) => {
+        $(".dispatch-attached-units").fadeIn(0);
+        $(".dispatch-attached-units-container").fadeIn(250);
+        $(".close-all").css("filter", "brightness(15%)");
+        $(".dispatch-attached-units-holder").empty();
+        $.each(resp, function (index, value) {
+          $(
+            ".dispatch-attached-units-holder"
+          ).prepend(`<div class="dispatch-attached-unit-item" data-id="${value.source}">
+                        <div class="unit-name">${value.name}</div>
+                    </div> `);
+        });
       })
-    );
+    }
   });
 
   $("#respondcalls").keydown(function (e) {
@@ -3422,20 +3415,6 @@ $(document).ready(() => {
     }
   });
 
-  $(".contextmenu").on("click", ".respond-call", function () {
-    const callId = $(this).data("info");
-    $.post(
-      `https://${GetParentResourceName()}/getCallResponses`,
-      JSON.stringify({
-        callid: callId,
-      })
-    );
-    /**$(".respond-calls").fadeIn(0)
-    $(".respond-calls-container").fadeIn(250)
-    $(".close-all").css("filter", "brightness(15%)");
-    $("#respondcalls").val("")*/
-  });
-
   $('#vehiclePointsSlider').change(function(){
     var currentValue = $('#vehiclePointsSliderValue');
     currentValue.html(this.value);
@@ -3447,15 +3426,8 @@ $(document).ready(() => {
     ".active-calls-item",
     function (e) {
       const callId = $(this).data("id");
-      if (callId) {
+      if (callId !== undefined) {
         openContextMenu(e, [
-          {
-            className: "respond-call",
-            icon: "fas fa-reply",
-            text: "Respond to Call",
-            info: callId,
-            status: "",
-          },
           {
             className: "attached-units",
             icon: "fas fa-link",
@@ -3464,23 +3436,9 @@ $(document).ready(() => {
             status: "",
           },
           {
-            className: "call-detach",
-            icon: "fas fa-sign-out-alt",
-            text: "Detach",
-            info: callId,
-            status: "",
-          },
-          {
             className: "call-attach",
             icon: "fas fa-sign-in-alt",
             text: "Respond",
-            info: callId,
-            status: "",
-          },
-          {
-            className: "Set-Waypoint",
-            icon: "fas fa-map-marker-alt",
-            text: "Set Waypoint",
             info: callId,
             status: "",
           },
@@ -4453,29 +4411,6 @@ $(document).ready(() => {
           $(DispatchItem).hide().fadeIn("slow")
         );
       }
-    } else if (eventData.type == "attachedUnits") {
-      const table = eventData.data;
-      if (table) {
-        $(".dispatch-attached-units").fadeIn(0);
-        $(".dispatch-attached-units-container").fadeIn(250);
-        $(".close-all").css("filter", "brightness(15%)");
-        $(".dispatch-attached-units-holder").empty();
-        $.each(table, function (index, value) {
-          $(
-            ".dispatch-attached-units-holder"
-          ).prepend(`<div class="dispatch-attached-unit-item" data-id="${value.cid}">
-                        <div class="unit-job unit-police">${value.job}</div>
-                        <div class="unit-name">(${value.callsign}) ${value.fullname}</div>
-                        <div class="unit-radio">1</div>
-                    </div> `);
-        });
-        setTimeout(() => {
-          $(".dispatch-attached-units-container").attr(
-            "id",
-            eventData.callid
-          );
-        }, 1000);
-      }
     } else if (eventData.type == "sendCallResponse") {
       if ($(".respond-calls-container").data("id") == eventData.callid) {
         $(".respond-calls-responses").prepend(
@@ -4505,6 +4440,7 @@ $(document).ready(() => {
       });
     } else if (eventData.type == "calls") {
       const table = eventData.data;
+      calls = eventData.data;
       $(".active-calls-list").empty();
       $.each(table, function (index, value) {
         let DispatchItem = `<div class="active-calls-item" data-id="${index}" data-canrespond="true"><div class="active-call-inner-container"><div class="call-item-top"><div class="call-number">#${index + 1}</div><div class="call-code">${value.top.code}</div><div class="call-title">${value.top.text}</div><div class="call-radio">${value.claimedList.length}</div></div><div class="call-item-bottom">`;
